@@ -4,4 +4,43 @@ html, body {
 	padding: 0; 
 }
 
-#map { height: 100%; }
+#map { 
+	height: 100%;
+}
+
+.location {
+	height: 35%;
+	width: 15%;
+	position: absolute;
+	float: left;
+	background-color: #e1e1e1;
+	top: 60%;
+	left: 3%;
+	opacity: 0.5;
+	box-shadow: 9px 13px 46px -2px rgba(0,0,0,0.75);
+	transition-duration: .4s;
+}
+
+.location:hover {
+	opacity: .75;
+	transition-duration: .2s;
+}
+
+#place-list {
+	list-style: none;
+}
+
+a {
+	text-decoration: none;
+	color: #1e1e1e;
+}
+
+#place {
+	margin: 20px 40px 20px 0;
+	border-bottom: 1px solid #1e1e1e;
+}
+
+#place:hover {
+	opacity: 1;
+	text-shadow: 0 2px 0 #bfbfbf;
+}
