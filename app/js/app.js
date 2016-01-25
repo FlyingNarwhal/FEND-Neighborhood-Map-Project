@@ -7,7 +7,7 @@ function initMap(){
 	});
 
 	//for each 'place' in the PlacesOfInterest Array, create a marker, and info window
-	PlacesOfInterest.forEach(function(place){
+	PlacesOfInterest.forEach(function(place, index){
 		var description = "<strong>" + place.name + "</strong>" + "<p>" +
 		 place.description + "</p>" + '<a href="' + place.url + '">' +
 		 "Visit Website" + "</a>";
@@ -17,6 +17,11 @@ function initMap(){
 		});
 		marker.addListener('click', function(evt){
 			infoWindow.open(map, marker);
+		});
+
+		document.getElementById(index).addEventListener('click', function(){
+			infoWindow.open(map, marker);
+			console.log('click received');
 		});
 	});
 };
@@ -64,23 +69,23 @@ var PlacesOfInterest = [
 	description: 'A unique twist on soda.',
 	url: 'thesodashop.co'
 },{
-	name: 'filler text',
-	lat: 33.123,
-	lng: -111.123,
-	description: '',
-	url: ''
+	name: 'ex. 1',
+	lat: 33.358,
+	lng: -111.855,
+	description: 'lorem ipsum yada yada yada',
+	url: 'google.com'
 },{
-	name: 'filler text',
-	lat: 33.123,
-	lng: -111.789,
-	description: '',
-	url: ''
+	name: 'ex.2',
+	lat: 33.349,
+	lng: -111.689,
+	description: 'lorem ipsum yada yada yada',
+	url: 'google.com'
 },{
-	name: 'filler text',
-	lat: 33.123,
-	lng: -111.456,
-	description:'',
-	url: ''
+	name: 'ex. 3',
+	lat: 33.366,
+	lng: -111.656,
+	description:'lorem ipsum yada yada yada',
+	url: 'google.com'
 }];
 
 ko.applyBindings(new ViewModel);
