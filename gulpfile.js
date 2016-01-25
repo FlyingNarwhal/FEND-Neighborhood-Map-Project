@@ -13,6 +13,6 @@ gulp.task('compress', function() {
 });
 
 gulp.task('deploy', function() {
-	return gulp.src('./dist/**/*')
+	return gulp.src('./app/**/*')
 	.pipe(ghPages());
 });

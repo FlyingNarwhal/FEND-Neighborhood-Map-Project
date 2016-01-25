@@ -1,4 +1,8 @@
-var map;
+function init(){
+	var map = new initMap();
+	ko.applyBindings(new ViewModel());
+}
+
 function initMap(){
 	//create map and center it on Gilbert AZ
 	map = new google.maps.Map(document.getElementById('map'), {
@@ -6,24 +10,31 @@ function initMap(){
 		zoom: 12,
 	});
 
-	//for each 'place' in the PlacesOfInterest Array, create a marker, and info window
-	PlacesOfInterest.forEach(function(place, index){
-		var description = "<strong>" + place.name + "</strong>" + "<p>" +
-		 place.description + "</p>" + '<a href="' + place.url + '">' +
-		 "Visit Website" + "</a>";
-		var marker = new google.maps.Marker(markerOptions(place.lat, place.lng, place.name, map))
-		var infoWindow = new google.maps.InfoWindow({
-			content: description
-		});
-		marker.addListener('click', function(evt){
-			infoWindow.open(map, marker);
-		});
-
-		document.getElementById(index).addEventListener('click', function(){
-			infoWindow.open(map, marker);
-			console.log('click received');
-		});
-	});
+/**
+*		//TODO Refactor code, to seperate concerns
+*
+*		//for each 'place' in the PlacesOfInterest Array, create a marker, and info window
+*		PlacesOfInterest.forEach(function(place, index){
+*			var description = "<strong>" + place.name + "</strong>" + "<p>" +
+*	 		place.description + "</p>" + '<a href="' + place.url + '">' +
+*	 		"Visit Website" + "</a>";
+*
+*			var marker = new google.maps.Marker(markerOptions(place.lat, place.lng, place.name, map))
+*			var infoWindow = new google.maps.InfoWindow({
+*				content: description
+*			});
+*
+*			marker.addListener('click', function(evt){
+*				infoWindow.open(map, marker);
+*			});
+*
+*			//add an event listener to each the listView, to open the info window
+*			document.getElementById(index).addEventListener('click', function(){
+*				infoWindow.open(map, marker);
+*			});
+*		});
+**/
+	
 };
 
 var ViewModel = function(){
@@ -34,12 +45,12 @@ var ViewModel = function(){
 	this.markerArray = ko.observableArray([]);
 
 	PlacesOfInterest.forEach(function(place){
-		that.markerArray.push(new destination(place))
-	})
+		that.markerArray.push(new destination(place, map))
+	});
 };
 
 
-var markerOptions = function(lat, lng, title, map){
+var markerOptions = function(lat, lng, title){
 	var position = {lat, lng};
 	return {
 		position: position,
@@ -48,11 +59,35 @@ var markerOptions = function(lat, lng, title, map){
 	}
 };
 
+var infoWindow = function(data){
+	that = this;
+
+	console.log(data.lat());
+	var description = "<strong>" + data.name() + "</strong>" + "<p>" +
+	 		data.description() + "</p>" + '<a href="' + data.url() + '">' +
+	 		"Visit Website" + "</a>";
+	// var lat = data.lat;
+	// var lng = data.lng;
+	var position = {lat: data.lat(), lng: data.lng()};
+
+	this.description = ko.observable(description);
+	this.position = ko.observable(position);
+
+	var window = new google.maps.InfoWindow({
+		content: description,
+		position: position,
+		map: map
+	});
+};
+
 var destination = function(data){
 	this.name = ko.observable(data.name);
 	this.lat = ko.observable(data.lat);
 	this.lng = ko.observable(data.lng);
 	this.description = ko.observable(data.description);
+	this.url = ko.observable(data.url);
+
+	var marker = new google.maps.Marker(markerOptions(data.lat, data.lng, data.name));
 };
 
 var PlacesOfInterest = [
@@ -88,4 +123,4 @@ var PlacesOfInterest = [
 	url: 'google.com'
 }];
 
-ko.applyBindings(new ViewModel);
+// ko.applyBindings(new ViewModel);
