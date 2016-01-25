@@ -13,6 +13,7 @@
 	</div>
 
 	<div class="location">
+		<input class="filter-bar" placeholder="filter..." data-bind="text-input: "></input>
 		<ul id="place-list" data-bind="foreach: markerArray">
 			<li class="destination" id="place"><a href="#" data-bind="text: name, click: $parent.openInfoWindow,
 			attr: {id: $index}"></a></li>

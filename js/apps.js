@@ -73,7 +73,7 @@ var loadMap = function(){
 	loadMarker({lat: 33.3500, lng: -111.7892});
 };
 
-var loadMarker = function(position){
+var loadMarker = function(position, title){
 	marker = new google.maps.Marker({
 		position: position,
 		title: 'hello world',

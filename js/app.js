@@ -19,9 +19,10 @@ function initMap(){
 			infoWindow.open(map, marker);
 		});
 
+		//add an event listener to each the listView, to open the info window
 		document.getElementById(index).addEventListener('click', function(){
 			infoWindow.open(map, marker);
-			console.log('click received');
+			// console.log('click received');
 		});
 	});
 };
@@ -35,7 +36,10 @@ var ViewModel = function(){
 
 	PlacesOfInterest.forEach(function(place){
 		that.markerArray.push(new destination(place))
-	})
+	});
+
+	this.filter = ko.observable();
+	console.log(this.filter());
 };
 
 
