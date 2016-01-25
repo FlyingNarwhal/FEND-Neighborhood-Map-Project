@@ -1,10 +1,12 @@
 var map;
 function initMap(){
+	//create map and center it on Gilbert AZ
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: {lat: 33.3500, lng: -111.7892},
 		zoom: 12,
 	});
 
+	//for each 'place' in the PlacesOfInterest Array, create a marker, and info window
 	PlacesOfInterest.forEach(function(place){
 		var description = "<strong>" + place.name + "</strong>" + "<p>" +
 		 place.description + "</p>" + '<a href="' + place.url + '">' +
@@ -15,7 +17,6 @@ function initMap(){
 		});
 		marker.addListener('click', function(evt){
 			infoWindow.open(map, marker);
-			console.log(evt);
 		});
 	});
 };
@@ -23,16 +24,15 @@ function initMap(){
 var ViewModel = function(){
 	var that = this;
 
-	this.markerSet = ko.observableArray([]);
+	//create a knockout oberservable array, which will hold
+	//an object of each 'place' inside PlacesOfInterest
+	this.markerArray = ko.observableArray([]);
 
 	PlacesOfInterest.forEach(function(place){
-		that.markerSet.push(new destination(place))
+		that.markerArray.push(new destination(place))
 	})
-
-	this.infoWindow = function(data){
-		destination.window();
-	};
 };
+
 
 var markerOptions = function(lat, lng, title, map){
 	var position = {lat, lng};
