@@ -37,9 +37,6 @@ var ViewModel = function(){
 	PlacesOfInterest.forEach(function(place){
 		that.markerArray.push(new destination(place))
 	});
-
-	this.filter = ko.observable();
-	console.log(this.filter());
 };
 
 
