@@ -1,5 +1,11 @@
+/**
+*	
+*
+*
+**/
 function init(){
 	var map = new initMap();
+	var infoWindow = new initInfoWindow();
 	ko.applyBindings(new ViewModel());
 }
 
@@ -8,35 +14,20 @@ function initMap(){
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: {lat: 33.3500, lng: -111.7892},
 		zoom: 12,
-	});
-
-/**
-*		//TODO Refactor code, to seperate concerns
-*
-*		//for each 'place' in the PlacesOfInterest Array, create a marker, and info window
-*		PlacesOfInterest.forEach(function(place, index){
-*			var description = "<strong>" + place.name + "</strong>" + "<p>" +
-*	 		place.description + "</p>" + '<a href="' + place.url + '">' +
-*	 		"Visit Website" + "</a>";
-*
-*			var marker = new google.maps.Marker(markerOptions(place.lat, place.lng, place.name, map))
-*			var infoWindow = new google.maps.InfoWindow({
-*				content: description
-*			});
-*
-*			marker.addListener('click', function(evt){
-*				infoWindow.open(map, marker);
-*			});
-*
-*			//add an event listener to each the listView, to open the info window
-*			document.getElementById(index).addEventListener('click', function(){
-*				infoWindow.open(map, marker);
-*			});
-*		});
-**/
-	
+	});	
 };
 
+function initInfoWindow(){
+	infoWindow = new google.maps.InfoWindow({pixelOffset: new google.maps.Size(0, -40)});
+};
+
+
+/*
+*
+*
+*
+*
+**/
 var ViewModel = function(){
 	var that = this;
 
@@ -59,25 +50,16 @@ var markerOptions = function(lat, lng, title){
 	}
 };
 
-var infoWindow = function(data){
-	that = this;
-
-	console.log(data.lat());
+//receive clicks from KO, and reset infoWindow with new data
+var openWindow = function(data){
+	var position = {lat: data.lat(), lng: data.lng()};
 	var description = "<strong>" + data.name() + "</strong>" + "<p>" +
 	 		data.description() + "</p>" + '<a href="' + data.url() + '">' +
 	 		"Visit Website" + "</a>";
-	// var lat = data.lat;
-	// var lng = data.lng;
-	var position = {lat: data.lat(), lng: data.lng()};
-
-	this.description = ko.observable(description);
-	this.position = ko.observable(position);
-
-	var window = new google.maps.InfoWindow({
-		content: description,
-		position: position,
-		map: map
-	});
+	infoWindow.close();
+	infoWindow.setContent(description);
+	infoWindow.setPosition(position);
+	infoWindow.open(map);
 };
 
 var destination = function(data){
@@ -90,6 +72,11 @@ var destination = function(data){
 	var marker = new google.maps.Marker(markerOptions(data.lat, data.lng, data.name));
 };
 
+/**
+*
+*
+*
+**/
 var PlacesOfInterest = [
 {
 	name: 'Bagel Man',
@@ -122,5 +109,3 @@ var PlacesOfInterest = [
 	description:'lorem ipsum yada yada yada',
 	url: 'google.com'
 }];
-
-// ko.applyBindings(new ViewModel);
