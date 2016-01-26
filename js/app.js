@@ -1,32 +1,35 @@
-var map;
+/**
+*	Callback from google maps api to create a new map
+* and a new infoWindow.
+*	Also apply DOM bindings from knockout to the ViewModel
+* @return {object} returns a google.maps.Map(), 
+*		and a google.maps.InfoWindow()
+**/
+function init(){
+	var map = new initMap();
+	var infoWindow = new initInfoWindow();
+	ko.applyBindings(new ViewModel());
+}
+
 function initMap(){
 	//create map and center it on Gilbert AZ
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: {lat: 33.3500, lng: -111.7892},
 		zoom: 12,
-	});
-
-	//for each 'place' in the PlacesOfInterest Array, create a marker, and info window
-	PlacesOfInterest.forEach(function(place, index){
-		var description = "<strong>" + place.name + "</strong>" + "<p>" +
-		 place.description + "</p>" + '<a href="' + place.url + '">' +
-		 "Visit Website" + "</a>";
-		var marker = new google.maps.Marker(markerOptions(place.lat, place.lng, place.name, map))
-		var infoWindow = new google.maps.InfoWindow({
-			content: description
-		});
-		marker.addListener('click', function(evt){
-			infoWindow.open(map, marker);
-		});
-
-		//add an event listener to each the listView, to open the info window
-		document.getElementById(index).addEventListener('click', function(){
-			infoWindow.open(map, marker);
-			// console.log('click received');
-		});
-	});
+	});	
 };
 
+function initInfoWindow(){
+	infoWindow = new google.maps.InfoWindow({pixelOffset: new google.maps.Size(0, -40)});
+};
+
+
+/*
+* ViewModel to handle knockout events.
+*
+*
+*
+**/
 var ViewModel = function(){
 	var that = this;
 
@@ -34,28 +37,75 @@ var ViewModel = function(){
 	//an object of each 'place' inside PlacesOfInterest
 	this.markerArray = ko.observableArray([]);
 
+	/**
+	* create ko.observableArray of objects from each 
+	*	place in PlacesOfInterest
+	* @param place {object} received from PlacesOfInterest
+	*	@param map {object} received from initMap()
+	*/
 	PlacesOfInterest.forEach(function(place){
-		that.markerArray.push(new destination(place))
+		that.markerArray.push(new destination(place, map))
+	});
+
+	ko.utils.arrayForEach(this.markerArray(), function(place){
+		place.marker.addListener('click', function(){
+			animateMarker(place);
+			openWindow(place);
+		});
 	});
 };
 
-
-var markerOptions = function(lat, lng, title, map){
-	var position = {lat, lng};
-	return {
-		position: position,
-		title: title,
-		map: map
-	}
-};
-
+/*
+*	Class to create objects for ViewModel.markerArray
+* @param data {object} object from PlacesOfInterest
+*	@return {object} return observable object 
+*		to the ViewModel.markerArray 
+*	@return {object} new google.maps.Marker()
+*/
 var destination = function(data){
 	this.name = ko.observable(data.name);
 	this.lat = ko.observable(data.lat);
 	this.lng = ko.observable(data.lng);
 	this.description = ko.observable(data.description);
+	this.url = ko.observable(data.url);
+
+	this.marker = new google.maps.Marker(markerOptions(this.lat(), this.lng(), this.name()));
 };
 
+var markerOptions = function(lat, lng, title){
+	var position = {lat, lng};
+	return {
+		position: position,
+		title: title,
+		map: map,
+		animation: google.maps.Animation.DROP
+	}
+};
+
+var animateMarker = function(marker){
+	marker.marker.setAnimation(google.maps.Animation.BOUNCE);
+			setTimeout(function(){
+				marker.marker.setAnimation(null);
+			}, 1400);
+};
+
+//receive clicks from KO, and reset infoWindow with new data
+var openWindow = function(data){
+	var position = {lat: data.lat(), lng: data.lng()};
+	var description = "<strong>" + data.name() + "</strong>" + "<p>" +
+	 		data.description() + "</p>" + '<a href="' + data.url() + '">' +
+	 		"Visit Website" + "</a>";
+	infoWindow.close();
+	animateMarker(data);
+	infoWindow.setContent(description);
+	infoWindow.setPosition(position);
+	infoWindow.open(map);
+};
+
+/**
+* The initial data to be used to populate
+* the map with markers
+**/
 var PlacesOfInterest = [
 {
 	name: 'Bagel Man',
@@ -88,5 +138,3 @@ var PlacesOfInterest = [
 	description:'lorem ipsum yada yada yada',
 	url: 'google.com'
 }];
-
-ko.applyBindings(new ViewModel);

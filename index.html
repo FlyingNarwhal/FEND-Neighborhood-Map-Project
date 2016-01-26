@@ -13,14 +13,14 @@
 	</div>
 
 	<div class="location">
-		<input class="filter-bar" placeholder="filter..."></input>
+		<input class="filter-bar" placeholder=" filter..."></input>
 		<ul id="place-list" data-bind="foreach: markerArray">
-			<li class="destination" id="place"><a href="#" data-bind="text: name, click: $parent.openInfoWindow,
+			<li class="destination" id="place"><a href="#" data-bind="text: name, click: openWindow,
 			attr: {id: $index}"></a></li>
 		</ul>
 	</div>
 	
 	<script async type="text/javascript" src="js/app.js"></script>
-	<script async defer src="https://maps.googleapis.com/maps/api/js?callback=initMap"></script>
+	<script async defer src="https://maps.googleapis.com/maps/api/js?callback=init"></script>
 </body>
 </html>
