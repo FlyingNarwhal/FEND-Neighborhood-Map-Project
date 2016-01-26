@@ -46,6 +46,13 @@ var ViewModel = function(){
 	PlacesOfInterest.forEach(function(place){
 		that.markerArray.push(new destination(place, map))
 	});
+
+	ko.utils.arrayForEach(this.markerArray(), function(place){
+		place.marker.addListener('click', function(){
+			animateMarker(place);
+			openWindow(place);
+		});
+	});
 };
 
 /*
@@ -62,14 +69,7 @@ var destination = function(data){
 	this.description = ko.observable(data.description);
 	this.url = ko.observable(data.url);
 
-	var marker = new google.maps.Marker(markerOptions(data.lat, data.lng, data.name));
-	marker.addListener('click', function(){
-		marker.setAnimation(google.maps.Animation.BOUNCE)
-		setTimeout(function(){
-			marker.setAnimation(null);
-		}, 1500);
-		openWindow(ViewModel.markerArray);
-	})
+	this.marker = new google.maps.Marker(markerOptions(this.lat(), this.lng(), this.name()));
 };
 
 var markerOptions = function(lat, lng, title){
@@ -82,12 +82,12 @@ var markerOptions = function(lat, lng, title){
 	}
 };
 
-var toggleBounce = function(marker){
-	marker.setAnimation(google.maps.Animation.BOUNCE);
-	setTimeout(function() {
-		marker.setAnimation(null);
-	}, 5000);
-}
+var animateMarker = function(marker){
+	marker.marker.setAnimation(google.maps.Animation.BOUNCE);
+			setTimeout(function(){
+				marker.marker.setAnimation(null);
+			}, 1400);
+};
 
 //receive clicks from KO, and reset infoWindow with new data
 var openWindow = function(data){
@@ -96,10 +96,10 @@ var openWindow = function(data){
 	 		data.description() + "</p>" + '<a href="' + data.url() + '">' +
 	 		"Visit Website" + "</a>";
 	infoWindow.close();
+	animateMarker(data);
 	infoWindow.setContent(description);
 	infoWindow.setPosition(position);
 	infoWindow.open(map);
-	// toggleBounce(data);
 };
 
 /**
