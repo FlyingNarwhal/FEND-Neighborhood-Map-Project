@@ -36,6 +36,10 @@ var ViewModel = function(){
 	//create a knockout oberservable array, which will hold
 	//an object of each 'place' inside PlacesOfInterest
 	this.markerArray = ko.observableArray([]);
+	this.query = ko.observable();
+	this.query.subscribe(function(value){
+		console.log(value);
+	})
 
 	/**
 	* create ko.observableArray of objects from each 
@@ -54,6 +58,8 @@ var ViewModel = function(){
 		});
 	});
 };
+
+
 
 /*
 *	Class to create objects for ViewModel.markerArray
