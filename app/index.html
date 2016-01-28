@@ -14,8 +14,8 @@
 
 	<div class="location">
 		<input class="filter-bar" placeholder=" filter" data-bind="textInput: query"></input>
-		<ul id="place-list" data-bind="foreach: markerArray">
-			<li class="destination" id="place"><a href="#" data-bind="text: name, click: openWindow,
+		<ul id="place-list" data-bind="template: {foreach: filteredItems, data: name}">
+			<li class="destination place"><a href="#" data-bind="text: name, click: openWindow,
 			attr: {id: $index}"></a></li>
 		</ul>
 	</div>
