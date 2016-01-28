@@ -36,10 +36,30 @@ var ViewModel = function(){
 	//create a knockout oberservable array, which will hold
 	//an object of each 'place' inside PlacesOfInterest
 	this.markerArray = ko.observableArray([]);
-	this.query = ko.observable();
-	this.query.subscribe(function(value){
-		console.log(value);
-	})
+	this.filteredArray = ko.observableArray([]);
+	this.query = ko.observable('');
+
+	//TODO based on boolean value returned by stringstartswith, push to filtered array
+	this.filteredItems = ko.computed(function(){
+		var filter = this.query().toLowerCase();
+		// var filter = filterStr.toLowerCase();
+		if(!filter){
+			return that.markerArray();
+		} else {
+			return ko.utils.arrayFilter(that.markerArray(), function(data){
+				var string = stringStartsWith(data.name().toLowerCase(), filter);
+				if(string){
+					that.markerArray().forEach(function(place){
+						place.marker().setVisible(false);
+						if(place.name().toLowerCase() === string){
+							place.marker().setVisible(true);
+						};
+					});
+				};
+				return string;
+			});
+		};
+	}, that);
 
 	/**
 	* create ko.observableArray of objects from each 
@@ -52,14 +72,33 @@ var ViewModel = function(){
 	});
 
 	ko.utils.arrayForEach(this.markerArray(), function(place){
-		place.marker.addListener('click', function(){
+		place.marker().addListener('click', function(){
 			animateMarker(place);
 			openWindow(place);
 		});
 	});
 };
 
-
+/**
+* stringStartsWith adapted from knockout sourcecode
+* https://github.com/knockout/knockout/blob/master/src/utils.js
+* ko.utils.stringStartsWith() is not included in minified knockout
+*
+* @param string {string} the name atr in markerArray
+* @param startsWith {string} received from viewModel filter input
+* @return {boolean}
+*/
+var stringStartsWith = function(string, startsWith){
+  string = string || "";
+ 	if(startsWith.length > string.length){
+ 		return false;
+ 	} else {
+ 		if(string.substring(0, startsWith.length) === startsWith){
+ 			console.log();
+ 			return string;
+ 		};
+ 	};
+};
 
 /*
 *	Class to create objects for ViewModel.markerArray
@@ -74,8 +113,11 @@ var destination = function(data){
 	this.lng = ko.observable(data.lng);
 	this.description = ko.observable(data.description);
 	this.url = ko.observable(data.url);
+	this.id = ko.observable(data.id);
+	this.marker = ko.observable(new google.maps.Marker(markerOptions(
+		this.lat(), this.lng(), this.name())));
 
-	this.marker = new google.maps.Marker(markerOptions(this.lat(), this.lng(), this.name()));
+	// this.marker = new google.maps.Marker(markerOptions(this.lat(), this.lng(), this.name()));
 };
 
 var markerOptions = function(lat, lng, title){
@@ -89,9 +131,9 @@ var markerOptions = function(lat, lng, title){
 };
 
 var animateMarker = function(marker){
-	marker.marker.setAnimation(google.maps.Animation.BOUNCE);
+	marker.marker().setAnimation(google.maps.Animation.BOUNCE);
 			setTimeout(function(){
-				marker.marker.setAnimation(null);
+				marker.marker().setAnimation(null);
 			}, 1400);
 };
 
@@ -118,29 +160,34 @@ var PlacesOfInterest = [
 	lat: 33.348880,
 	lng: -111.976837,
 	description: 'Get yourself some decent bagels.',
-	url: ''
+	url: '',
+	id: 0
 },{
 	name: 'The Soda Shop',
 	lat: 33.378187,
 	lng:  -111.741916,
 	description: 'A unique twist on soda.',
-	url: 'thesodashop.co'
+	url: 'thesodashop.co',
+	id: 1
 },{
 	name: 'ex. 1',
 	lat: 33.358,
 	lng: -111.855,
 	description: 'lorem ipsum yada yada yada',
-	url: 'google.com'
+	url: 'google.com',
+	id: 2
 },{
 	name: 'ex.2',
 	lat: 33.349,
 	lng: -111.689,
 	description: 'lorem ipsum yada yada yada',
-	url: 'google.com'
+	url: 'google.com',
+	id: 3
 },{
 	name: 'ex. 3',
 	lat: 33.366,
 	lng: -111.656,
 	description:'lorem ipsum yada yada yada',
-	url: 'google.com'
+	url: 'google.com',
+	id: 4
 }];
