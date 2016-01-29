@@ -39,27 +39,29 @@ var ViewModel = function(){
 	this.filteredArray = ko.observableArray([]);
 	this.query = ko.observable('');
 
-	//TODO based on boolean value returned by stringstartswith, push to filtered array
 	this.filteredItems = ko.computed(function(){
-		var filter = this.query().toLowerCase();
-		// var filter = filterStr.toLowerCase();
-		if(!filter){
+		var filter = ko.observable(this.query().toLowerCase());
+		if(!filter()){
 			return that.markerArray();
 		} else {
 			return ko.utils.arrayFilter(that.markerArray(), function(data){
-				var string = stringStartsWith(data.name().toLowerCase(), filter);
-				if(string){
-					that.markerArray().forEach(function(place){
-						place.marker().setVisible(false);
-						if(place.name().toLowerCase() === string){
-							place.marker().setVisible(true);
-						};
-					});
-				};
+				var string = stringStartsWith(data.name().toLowerCase(), filter());
+				console.log(that.query());
+				if(string == undefined){
+					data.marker().setVisible(false);
+				}
 				return string;
 			});
 		};
 	}, that);
+
+	this.query.subscribe(function(data){
+		if(data == ''){
+			ko.utils.arrayForEach(that.markerArray(), function(place){
+				place.marker().setVisible(true);
+			})
+		}
+	})
 
 	/**
 	* create ko.observableArray of objects from each 
@@ -84,9 +86,9 @@ var ViewModel = function(){
 * https://github.com/knockout/knockout/blob/master/src/utils.js
 * ko.utils.stringStartsWith() is not included in minified knockout
 *
-* @param string {string} the name atr in markerArray
+* @param string {string} the name property in markerArray
 * @param startsWith {string} received from viewModel filter input
-* @return {boolean}
+* @return {string} 
 */
 var stringStartsWith = function(string, startsWith){
   string = string || "";
@@ -116,6 +118,7 @@ var destination = function(data){
 	this.id = ko.observable(data.id);
 	this.marker = ko.observable(new google.maps.Marker(markerOptions(
 		this.lat(), this.lng(), this.name())));
+	this.visible = ko.observable(data.visible);
 
 	// this.marker = new google.maps.Marker(markerOptions(this.lat(), this.lng(), this.name()));
 };
@@ -161,33 +164,33 @@ var PlacesOfInterest = [
 	lng: -111.976837,
 	description: 'Get yourself some decent bagels.',
 	url: '',
-	id: 0
+	visible: true
 },{
 	name: 'The Soda Shop',
 	lat: 33.378187,
 	lng:  -111.741916,
 	description: 'A unique twist on soda.',
 	url: 'thesodashop.co',
-	id: 1
+	visible: true
 },{
 	name: 'ex. 1',
 	lat: 33.358,
 	lng: -111.855,
 	description: 'lorem ipsum yada yada yada',
 	url: 'google.com',
-	id: 2
+	visible: true
 },{
 	name: 'ex.2',
 	lat: 33.349,
 	lng: -111.689,
 	description: 'lorem ipsum yada yada yada',
 	url: 'google.com',
-	id: 3
+	visible: true
 },{
 	name: 'ex. 3',
 	lat: 33.366,
 	lng: -111.656,
 	description:'lorem ipsum yada yada yada',
 	url: 'google.com',
-	id: 4
+	visible: true
 }];
