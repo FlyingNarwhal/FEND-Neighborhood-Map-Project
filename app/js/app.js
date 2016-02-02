@@ -7,9 +7,10 @@
 **/
 function init(){
 	var map = new initMap();
+	var service;
 	var infoWindow = new initInfoWindow();
 	ko.applyBindings(new ViewModel());
-}
+};
 
 function initMap(){
 	//create map and center it on Gilbert AZ
@@ -22,7 +23,6 @@ function initMap(){
 function initInfoWindow(){
 	infoWindow = new google.maps.InfoWindow({pixelOffset: new google.maps.Size(0, -40)});
 };
-
 
 /*
 * ViewModel to handle knockout events.
@@ -39,20 +39,113 @@ var ViewModel = function(){
 	this.filteredArray = ko.observableArray([]);
 	this.query = ko.observable('');
 
+	this.markerOptions = function(lat, lng, title){
+		var position = {lat, lng};
+		// console.log(position)
+		return {
+			position: position,
+			title: title,
+			map: map,
+			animation: google.maps.Animation.DROP
+		}
+	};
+
+	/*
+	*	Class to create objects for ViewModel.markerArray
+	* @param data {object} object from PlacesOfInterest
+	*	@return {object} return observable object 
+	*		to the ViewModel.markerArray 
+	*	@return {object} new google.maps.Marker()
+	*/
+	this.destination = function(data, Placelat, Placelng){
+		this.name = ko.observable(data.name);
+		this.lat = ko.observable(data.lat) || ko.observable(Placelat);
+		this.lng = ko.observable(data.lng) || ko.observable(Placelng);
+		// console.log('destination', this.lat(), this.lng());
+		this.description = ko.observable(data.description);
+		this.url = ko.observable(data.url);
+		this.id = ko.observable(data.id);
+		this.marker = ko.observable(new google.maps.Marker(that.markerOptions(
+			this.lat(), this.lng(), this.name())));
+		this.visible = ko.observable(data.visible);
+
+		// this.marker = new google.maps.Marker(markerOptions(this.lat(), this.lng(), this.name()));
+	};
+
+	this.animateMarker = function(marker){
+		marker.marker().setAnimation(google.maps.Animation.BOUNCE);
+				setTimeout(function(){
+					marker.marker().setAnimation(null);
+				}, 1400);
+	};
+
+	//receive clicks from KO, and reset infoWindow with new data
+	this.openWindow = function(data){
+		var position = {lat: data.lat(), lng: data.lng()};
+		var description = "<strong>" + data.name() + "</strong>" + "<p>" +
+		 		data.description() + "</p>" + '<a href="' + data.url() + '">' +
+		 		"Visit Website" + "</a>";
+		infoWindow.close();
+		that.animateMarker(data);
+		infoWindow.setContent(description);
+		infoWindow.setPosition(position);
+		infoWindow.open(map);
+	};
+
+	this.googlePlacesAPI = function(){
+		var request = {
+			location: {lat: 33.3500, lng: -111.7892},
+			radius: '700',
+			query: 'restaurants' 
+		};
+
+		service = new google.maps.places.PlacesService(map);
+		service.textSearch(request, callback);
+
+		function callback(results, status){
+			if(status == google.maps.places.PlacesServiceStatus.OK){
+				results.forEach(function(place){
+					var lat = place.geometry.location.lat();
+					var lng = place.geometry.location.lng();
+					console.log('callback', lat, lng, lat.constructor)
+					// console.log(place.geometry.location.lat());
+					// console.log(place.geometry.location.lng());
+					that.markerArray.push(new that.destination(place, lat, lng));
+				})
+			};
+		}
+	};
+
+	/**
+	* create ko.observableArray of objects from each 
+	*	place in PlacesOfInterest
+	* @param place {object} received from PlacesOfInterest
+	*	@param map {object} received from initMap()
+	*/
+	PlacesOfInterest.forEach(function(place){
+		that.markerArray.push(new that.destination(place))
+	});
+
+	this.googlePlacesAPI();
+
+	// filter items in markerArray based on user input
+	// and remove the item from the listView, and its 
+	// corresponding marker
 	this.filteredItems = ko.computed(function(){
 		var filter = ko.observable(this.query().toLowerCase());
 		if(!filter()){
 			return that.markerArray();
 		} else {
 			return ko.utils.arrayFilter(that.markerArray(), function(data){
-				var string = stringStartsWith(data.name().toLowerCase(), filter());
-				console.log(that.query());
-				if(string == undefined){
+				var string = data.name().toLowerCase().indexOf(filter()) !== -1;
+				if(!string){
 					data.marker().setVisible(false);
 				}
+				// TODO see if filter() exists in the infoWindow title, if so, keep infowindow
+				// else remove the window, use substring()
 				return string;
 			});
-		};
+		}
 	}, that);
 
 	this.query.subscribe(function(data){
@@ -63,94 +156,12 @@ var ViewModel = function(){
 		}
 	})
 
-	/**
-	* create ko.observableArray of objects from each 
-	*	place in PlacesOfInterest
-	* @param place {object} received from PlacesOfInterest
-	*	@param map {object} received from initMap()
-	*/
-	PlacesOfInterest.forEach(function(place){
-		that.markerArray.push(new destination(place, map))
-	});
-
 	ko.utils.arrayForEach(this.markerArray(), function(place){
 		place.marker().addListener('click', function(){
-			animateMarker(place);
-			openWindow(place);
+			that.animateMarker(place);
+			that.openWindow(place);
 		});
 	});
-};
-
-/**
-* stringStartsWith adapted from knockout sourcecode
-* https://github.com/knockout/knockout/blob/master/src/utils.js
-* ko.utils.stringStartsWith() is not included in minified knockout
-*
-* @param string {string} the name property in markerArray
-* @param startsWith {string} received from viewModel filter input
-* @return {string} 
-*/
-var stringStartsWith = function(string, startsWith){
-  string = string || "";
- 	if(startsWith.length > string.length){
- 		return false;
- 	} else {
- 		if(string.substring(0, startsWith.length) === startsWith){
- 			console.log();
- 			return string;
- 		};
- 	};
-};
-
-/*
-*	Class to create objects for ViewModel.markerArray
-* @param data {object} object from PlacesOfInterest
-*	@return {object} return observable object 
-*		to the ViewModel.markerArray 
-*	@return {object} new google.maps.Marker()
-*/
-var destination = function(data){
-	this.name = ko.observable(data.name);
-	this.lat = ko.observable(data.lat);
-	this.lng = ko.observable(data.lng);
-	this.description = ko.observable(data.description);
-	this.url = ko.observable(data.url);
-	this.id = ko.observable(data.id);
-	this.marker = ko.observable(new google.maps.Marker(markerOptions(
-		this.lat(), this.lng(), this.name())));
-	this.visible = ko.observable(data.visible);
-
-	// this.marker = new google.maps.Marker(markerOptions(this.lat(), this.lng(), this.name()));
-};
-
-var markerOptions = function(lat, lng, title){
-	var position = {lat, lng};
-	return {
-		position: position,
-		title: title,
-		map: map,
-		animation: google.maps.Animation.DROP
-	}
-};
-
-var animateMarker = function(marker){
-	marker.marker().setAnimation(google.maps.Animation.BOUNCE);
-			setTimeout(function(){
-				marker.marker().setAnimation(null);
-			}, 1400);
-};
-
-//receive clicks from KO, and reset infoWindow with new data
-var openWindow = function(data){
-	var position = {lat: data.lat(), lng: data.lng()};
-	var description = "<strong>" + data.name() + "</strong>" + "<p>" +
-	 		data.description() + "</p>" + '<a href="' + data.url() + '">' +
-	 		"Visit Website" + "</a>";
-	infoWindow.close();
-	animateMarker(data);
-	infoWindow.setContent(description);
-	infoWindow.setPosition(position);
-	infoWindow.open(map);
 };
 
 /**
@@ -180,7 +191,7 @@ var PlacesOfInterest = [
 	url: 'google.com',
 	visible: true
 },{
-	name: 'ex.2',
+	name: 'ex. 2',
 	lat: 33.349,
 	lng: -111.689,
 	description: 'lorem ipsum yada yada yada',

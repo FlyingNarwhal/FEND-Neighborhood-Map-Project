@@ -13,14 +13,16 @@
 	</div>
 
 	<div class="location">
-		<input class="filter-bar" placeholder=" filter" data-bind="textInput: query"></input>
+		<input class="filter-bar" placeholder=" filter" data-bind="textInput: query" autofocus></input>
 		<ul id="place-list" data-bind="template: {foreach: filteredItems, data: name}">
-			<li class="destination place"><a href="#" data-bind="text: name, click: openWindow,
+			<li class="destination place"><a href="#" data-bind="text: name, click: $parent.openWindow,
 			attr: {id: $index}"></a></li>
 		</ul>
 	</div>
 	
 	<script async type="text/javascript" src="js/app.js"></script>
-	<script async defer src="https://maps.googleapis.com/maps/api/js?callback=init"></script>
+	<script async defer src="https://maps.googleapis.com/maps/api/js?&libraries=places&callback=init"></script>
+	<!-- // <script async type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script> -->
+
 </body>
 </html>
