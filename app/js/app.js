@@ -59,14 +59,13 @@ var ViewModel = function(){
 	*/
 	this.destination = function(data, Placelat, Placelng){
 		this.name = ko.observable(data.name);
-		this.lat = ko.observable(data.lat) || ko.observable(Placelat);
-		this.lng = ko.observable(data.lng) || ko.observable(Placelng);
-		// console.log('destination', this.lat(), this.lng());
+		this.lat = data.lat || Placelat;
+		this.lng = data.lng || Placelng;
 		this.description = ko.observable(data.description);
 		this.url = ko.observable(data.url);
 		this.id = ko.observable(data.id);
 		this.marker = ko.observable(new google.maps.Marker(that.markerOptions(
-			this.lat(), this.lng(), this.name())));
+			this.lat, this.lng, this.name())));
 		this.visible = ko.observable(data.visible);
 
 		// this.marker = new google.maps.Marker(markerOptions(this.lat(), this.lng(), this.name()));
@@ -81,7 +80,7 @@ var ViewModel = function(){
 
 	//receive clicks from KO, and reset infoWindow with new data
 	this.openWindow = function(data){
-		var position = {lat: data.lat(), lng: data.lng()};
+		var position = {lat: data.lat, lng: data.lng};
 		var description = "<strong>" + data.name() + "</strong>" + "<p>" +
 		 		data.description() + "</p>" + '<a href="' + data.url() + '">' +
 		 		"Visit Website" + "</a>";
@@ -95,7 +94,7 @@ var ViewModel = function(){
 	this.googlePlacesAPI = function(){
 		var request = {
 			location: {lat: 33.3500, lng: -111.7892},
-			radius: '700',
+			radius: '12000',
 			query: 'restaurants' 
 		};
 
@@ -107,12 +106,24 @@ var ViewModel = function(){
 				results.forEach(function(place){
 					var lat = place.geometry.location.lat();
 					var lng = place.geometry.location.lng();
-					console.log('callback', lat, lng, lat.constructor)
-					// console.log(place.geometry.location.lat());
-					// console.log(place.geometry.location.lng());
 					that.markerArray.push(new that.destination(place, lat, lng));
+					console.log(place);
 				})
-			};
+				ko.utils.arrayForEach(that.markerArray(), function(place){
+					place.marker().addListener('click', function(){
+						that.animateMarker(place);
+						that.openWindow(place);
+					});
+				})
+			} else {
+				ko.utils.arrayForEach(that.markerArray(), function(place){
+					place.marker().addListener('click', function(){
+						that.animateMarker(place);
+						that.openWindow(place);
+					});
+				})
+				alert("Oops, something went wrong on our end,\nbut here are 5 places you'll still love!")
+			}
 		}
 	};
 
@@ -156,12 +167,13 @@ var ViewModel = function(){
 		}
 	})
 
-	ko.utils.arrayForEach(this.markerArray(), function(place){
-		place.marker().addListener('click', function(){
-			that.animateMarker(place);
-			that.openWindow(place);
-		});
-	});
+	// TODO make this also include those objects added by the API
+	// ko.utils.arrayForEach(this.markerArray(), function(place){
+	// 	place.marker().addListener('click', function(){
+	// 		that.animateMarker(place);
+	// 		that.openWindow(place);
+	// 	});
+	// });
 };
 
 /**
