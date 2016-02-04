@@ -38,6 +38,7 @@ var ViewModel = function(){
 	this.markerArray = ko.observableArray([]);
 	this.filteredArray = ko.observableArray([]);
 	this.query = ko.observable('');
+	this.yelpUrl = ko.observable();
 
 	this.markerOptions = function(lat, lng, title){
 		var position = {lat, lng};
@@ -62,7 +63,6 @@ var ViewModel = function(){
 		this.lat = data.lat || Placelat;
 		this.lng = data.lng || Placelng;
 		this.description = ko.observable(data.description);
-		this.url = ko.observable(data.url);
 		this.id = ko.observable(data.id);
 		this.marker = ko.observable(new google.maps.Marker(that.markerOptions(
 			this.lat, this.lng, this.name())));
@@ -80,10 +80,12 @@ var ViewModel = function(){
 
 	//receive clicks from KO, and reset infoWindow with new data
 	this.openWindow = function(data){
+		that.yelp(data);
 		var position = {lat: data.lat, lng: data.lng};
 		var description = "<strong>" + data.name() + "</strong>" + "<p>" +
-		 		data.description() + "</p>" + '<a href="' + data.url() + '">' +
+		 		data.description() + "</p>" + '<a href="' + that.yelpUrl() + '">' +
 		 		"Visit Website" + "</a>";
+		console.log(that.yelpUrl());
 		infoWindow.close();
 		that.animateMarker(data);
 		infoWindow.setContent(description);
@@ -107,7 +109,7 @@ var ViewModel = function(){
 					var lat = place.geometry.location.lat();
 					var lng = place.geometry.location.lng();
 					that.markerArray.push(new that.destination(place, lat, lng));
-					console.log(place);
+					// console.log(place);
 				})
 				ko.utils.arrayForEach(that.markerArray(), function(place){
 					place.marker().addListener('click', function(){
@@ -126,6 +128,53 @@ var ViewModel = function(){
 			}
 		}
 	};
+
+	this.yelp = function(place){
+		var auth = {
+			oauth_consumer_key: 'gsSlBzHSmPTFocOOnlKpqQ',
+			consumer_secret: 'OmL44ruWPPtwm2oeVvZO3PSeRhs',
+			token: 'cPfxv2_sPUjupYLzEH-OSXhYLGsODa89',
+			token_secret: '9XtYnUhZP_Ddmz-_n29-QY2uDi8',
+		};
+
+		var accessor = {
+			consumerSecret: auth.consumer_secret,
+			tokenSecret: auth.token_secret
+		};
+
+	  var parameters = {
+    term: place.name(),
+    location: 'gilbert',
+    oauth_consumer_key: auth.oauth_consumer_key,
+    oauth_token: auth.token,
+    oauth_nonce: (Math.random() * 1e10).toString(),
+    oauth_timestamp: Math.floor(Date.now()/1000),
+    oauth_signature_method: 'HMAC-SHA1',
+    callback: 'cb',
+  	};
+  	var message = {
+	    'action' : 'http://api.yelp.com/v2/search',
+	    'method' : 'GET',
+	    'parameters' : parameters
+	  };
+
+	  OAuth.setTimestampAndNonce(message);
+	  OAuth.SignatureMethod.sign(message, accessor);
+	  var parameterMap = OAuth.getParameterMap(message.parameters);
+	  parameterMap.oauth_signature = OAuth.percentEncode(parameterMap.oauth_signature);
+	  // TODO urls work, but only on the second click of the info window, figure out how to change this
+	  $.ajax({
+	  	'url': message.action,
+	  	'data': parameterMap,
+	  	'dataType': 'jsonp',
+	  	'timeout': 6000,
+	  	'jsonpCallback': 'cb',
+	  	'cache': true,
+	  	'success': function(data, textStatus, XMLHttpRequest){
+	  		that.yelpUrl(data.businesses[0].url);
+	  	}
+	  })
+	}
 
 	/**
 	* create ko.observableArray of objects from each 
@@ -165,7 +214,7 @@ var ViewModel = function(){
 				place.marker().setVisible(true);
 			})
 		}
-	})
+	});
 
 	// TODO make this also include those objects added by the API
 	// ko.utils.arrayForEach(this.markerArray(), function(place){
@@ -175,6 +224,8 @@ var ViewModel = function(){
 	// 	});
 	// });
 };
+
+
 
 /**
 * The initial data to be used to populate
@@ -186,34 +237,29 @@ var PlacesOfInterest = [
 	lat: 33.348880,
 	lng: -111.976837,
 	description: 'Get yourself some decent bagels.',
-	url: '',
 	visible: true
 },{
 	name: 'The Soda Shop',
 	lat: 33.378187,
 	lng:  -111.741916,
 	description: 'A unique twist on soda.',
-	url: 'thesodashop.co',
 	visible: true
 },{
 	name: 'ex. 1',
 	lat: 33.358,
 	lng: -111.855,
 	description: 'lorem ipsum yada yada yada',
-	url: 'google.com',
 	visible: true
 },{
 	name: 'ex. 2',
 	lat: 33.349,
 	lng: -111.689,
 	description: 'lorem ipsum yada yada yada',
-	url: 'google.com',
 	visible: true
 },{
 	name: 'ex. 3',
 	lat: 33.366,
 	lng: -111.656,
 	description:'lorem ipsum yada yada yada',
-	url: 'google.com',
 	visible: true
 }];
