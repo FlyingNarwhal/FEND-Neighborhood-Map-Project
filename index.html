@@ -19,10 +19,28 @@
 			attr: {id: $index}"></a></li>
 		</ul>
 	</div>
-	
+
+	<div class="yelp-info" data-bind="visible: yelpTitle">
+		<p class="place-title" data-bind="text: yelpTitle"></p>
+		<span class="fontawesome-remove-sign removeYelp" data-bind="click: hideYelp"></span>
+		<img class="place-img" data-bind="attr: {src: yelpImage}">
+		<img class="place-rating" data-bind="attr: {src: yelpRating}">
+		<p class="place-rating-num">out of: <span data-bind="text: yelpRatingNum"></span> reviews</p>
+		<p class="place-snippet">Reviews:</p>
+		<p class="place-snippet" data-bind="text: yelpReview"></p>
+		<p><a class="place-url" href="#" data-bind="attr: {href: yelpUrl}">Read more</a></p>
+		<img class="yelp-logo" src="images/yelp-logo-small.png">
+	</div>
+
+	<div class="api-error" data-bind="visible: apiError">
+		<p class="place-error" data-bind="text: apiError"></p>
+		<span class="fontawesome-remove-sign removeYelp" data-bind="click: hideYelp"></span>
+	</div>
+
+	<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
+	<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 	<script async type="text/javascript" src="js/app.js"></script>
 	<script async defer src="https://maps.googleapis.com/maps/api/js?&libraries=places&callback=init"></script>
-	<!-- // <script async type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script> -->
-
 </body>
 </html>
