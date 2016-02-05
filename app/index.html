@@ -9,11 +9,15 @@
 </head>
 
 <body>
+	<div id="error">
+		<p>Ruh-roh, something has gone awry!</p>
+		<p><a href="javascript:window.location.href=window.location.href">Try again</a> in a bit!</p>
+	</div>
 	<div id="map">
 	</div>
 
 	<div class="location">
-		<input class="filter-bar" placeholder=" filter" data-bind="textInput: query" autofocus></input>
+		<input class="filter-bar" placeholder=" filter" data-bind="textInput: query" autofocus>
 		<ul id="place-list" data-bind="template: {foreach: filteredItems, data: name}">
 			<li class="destination place"><a href="#" data-bind="text: name, click: $parent.openWindow,
 			attr: {id: $index}"></a></li>
@@ -39,8 +43,12 @@
 
 	<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
 	<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
+
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+
 	<script async type="text/javascript" src="js/app.js"></script>
-	<script async defer src="https://maps.googleapis.com/maps/api/js?&libraries=places&callback=init"></script>
+	<script type="text/javascript" src="js/error.js"></script>
+	
+	<script async defer src="https://maps.googleapis.com/maps/api/js?&libraries=places&callback=init" onerror="googleError()"></script>
 </body>
 </html>
