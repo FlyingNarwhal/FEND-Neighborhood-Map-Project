@@ -5,28 +5,28 @@
 * @return {object} returns a google.maps.Map(), 
 *		and a google.maps.InfoWindow()
 **/
+// var googleError = function(){
+// 	window.alert('error');	
+// }
+
 function init(){
 	var map = new initMap();
 	var service;
 	var infoWindow = new initInfoWindow();
 	ko.applyBindings(new ViewModel());
-};
+}
 
 function initMap(){
 	//create map and center it on Gilbert AZ
-	try {
-		map = new google.maps.Map(document.getElementById('map'), {
-			center: {lat: 33.3500, lng: -111.7892},
-			zoom: 12,
-		});	
-	} catch(err){
-		window.alert("Google Maps could not be\nreached at this moment.\nPlease try again later.");
-	}
-};
+	map = new google.maps.Map(document.getElementById('map'), {
+		center: {lat: 33.3500, lng: -111.7892},
+		zoom: 12,
+	});	
+}
 
 function initInfoWindow(){
 	infoWindow = new google.maps.InfoWindow({pixelOffset: new google.maps.Size(0, -40)});
-};
+}
 
 var ViewModel = function(){
 	var that = this;
@@ -60,7 +60,7 @@ var ViewModel = function(){
 			title: title,
 			map: map,
 			animation: google.maps.Animation.DROP
-		}
+		};
 	};
 
 	/*
@@ -134,7 +134,7 @@ var ViewModel = function(){
 					var lat = place.geometry.location.lat();
 					var lng = place.geometry.location.lng();
 					that.markerArray.push(new that.destination(place, lat, lng));
-				})
+				});
 				//create listeners for each marker once the callback has 
 				//populated the markerArray.
 				ko.utils.arrayForEach(that.markerArray(), function(place){
@@ -142,17 +142,17 @@ var ViewModel = function(){
 						that.animateMarker(place);
 						that.openWindow(place);
 					});
-				})
+				});
 				//if server responds != OK, add listeners to hard-coded locations only.
 				//and give error.
 			} else {
-				that.apiError("Oops, there was an error reaching Google Places, please try again later.")
+				that.apiError("Oops, there was an error reaching Google Places, please try again later.");
 				ko.utils.arrayForEach(that.markerArray(), function(place){
 					place.marker().addListener('click', function(){
 						that.animateMarker(place);
 						that.openWindow(place);
 					});
-				})
+				});
 			}
 		}
 	};
@@ -212,14 +212,14 @@ var ViewModel = function(){
 	  	}
 	  }).fail(function(){
 	  	that.apiError("Oops, there was an error reaching Yelp, please try again later.");
-	  })
+	  });
 	};
 
 	//receive calls from knockout click to hide the infoView
 	this.hideYelp = function(){
 		that.yelpTitle(false);
 		that.apiError(false);
-	}
+	};
 
 	/**
 	* create ko.observableArray of objects from each 
@@ -228,7 +228,7 @@ var ViewModel = function(){
 	*	@param map {object} received from initMap()
 	*/
 	PlacesOfInterest.forEach(function(place){
-		that.markerArray.push(new that.destination(place))
+		that.markerArray.push(new that.destination(place));
 	});
 
 	this.googlePlacesAPI();
@@ -254,10 +254,10 @@ var ViewModel = function(){
 	}, that);
 
 	this.query.subscribe(function(data){
-		if(data == ''){
+		if(data === ''){
 			ko.utils.arrayForEach(that.markerArray(), function(place){
 				place.marker().setVisible(true);
-			})
+			});
 		}
 	});
 };

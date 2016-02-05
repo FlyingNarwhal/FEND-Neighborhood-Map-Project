@@ -5,6 +5,24 @@
   font-family: 'FontAwesome', sans-serif;
 }
 
+#error {
+	display: none;
+	width: 20%;
+	height: 20%;
+	top: 35%;
+	left: 37%;
+	border-radius: 8px;
+	position: absolute;
+	background-color: rgba(225,0,0,0.8);
+}
+
+#error p, #error a{
+	/*width: 80%;*/
+	color: #1e1e1e;
+	text-align: center;
+	font-size: 18px;
+}
+
 html, body { 
 	height: 100%;
 	margin: 0;
