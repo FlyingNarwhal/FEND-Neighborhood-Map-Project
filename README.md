@@ -1,15 +1,14 @@
-# neighborhood-map-project
-Udacity Neighborhood Map Project P5-1
+Neighborhood Map Project
+========================
 
-This project is for the front-end web-developer nanodegree program.
+Front end Nanodegree Project 5
+------------------------------
+https://www.udacity.com/course/front-end-web-developer-nanodegree--nd001
 
-##Live Preview##
-http://flyingnarwhal.github.io/neighborhood-map-project/
+This project uses the Knockout framework (MVVM), and multiple AJAX requests.
+For a live preview of this project, [click here](https://FlyingNarwhal.github.io/neighborhood-map-project).
 
-To run:
-open app/index.html in your favorite browser,
-
-you can then filter restaurants located in the gilbert area based on name,
+You can then filter restaurants located in the gilbert area based on name,
 and view relevant data from yelp.
 
 Author: Joe Dahle

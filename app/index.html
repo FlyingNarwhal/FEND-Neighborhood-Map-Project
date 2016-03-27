@@ -17,6 +17,10 @@
 	</div>
 
 	<div class="location">
+		<form data-bind="submit: locationQuerySubmit">
+			<input class="location-bar" placeholder=" location">	
+			<button class="location-btn" type="submit">Search</button>
+		</form>
 		<input class="filter-bar" placeholder=" filter" data-bind="textInput: query" autofocus>
 		<ul id="place-list" data-bind="template: {foreach: filteredItems, data: name}">
 			<li class="destination place"><a href="#" data-bind="text: name, click: $parent.openWindow,
@@ -49,6 +53,6 @@
 	<script async type="text/javascript" src="js/app.js"></script>
 	<script type="text/javascript" src="js/error.js"></script>
 	
-	<script async defer src="https://maps.googleapis.com/maps/api/js?&libraries=places&callback=init" onerror="googleError()"></script>
+	<script async defer src="https://maps.googleapis.com/maps/api/js?&libraries=places&key=AIzaSyBNIVLiXyDmzGXGkgtNs_ukwQo_CarSksg&callback=init" onerror="googleError()"></script>
 </body>
 </html>
