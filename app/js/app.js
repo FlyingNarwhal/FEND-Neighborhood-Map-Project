@@ -17,8 +17,12 @@ function init(){
 }
 
 function initMap(){
+<<<<<<< HEAD
 	// create map and center it on Gilbert AZ
 	// var currentLocation = navigator.geolocation.getCurrentPosition;
+=======
+	//create map and center it on Gilbert AZ
+>>>>>>> 18ba52cfa2a1bc23733c4256d7597b7f59c2c5c8
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: {lat: 33.3500, lng: -111.7892},
 		zoom: 12,
