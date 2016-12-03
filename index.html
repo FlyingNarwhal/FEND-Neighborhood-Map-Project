@@ -17,6 +17,13 @@
 	</div>
 
 	<div class="location">
+<<<<<<< HEAD
+		<form data-bind="submit: locationQuerySubmit">
+			<input class="location-bar" placeholder=" location">	
+			<button class="location-btn" type="submit">Search</button>
+		</form>
+=======
+>>>>>>> 18ba52cfa2a1bc23733c4256d7597b7f59c2c5c8
 		<input class="filter-bar" placeholder=" filter" data-bind="textInput: query" autofocus>
 		<ul id="place-list" data-bind="template: {foreach: filteredItems, data: name}">
 			<li class="destination place"><a href="#" data-bind="text: name, click: $parent.openWindow,
@@ -41,14 +48,18 @@
 		<span class="fontawesome-remove-sign removeYelp" data-bind="click: hideYelp"></span>
 	</div>
 
-	<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
-	<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
+	<script type="text/javascript" src="https://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
+	<script type="text/javascript" src="https://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 
 	<script async type="text/javascript" src="js/app.js"></script>
 	<script type="text/javascript" src="js/error.js"></script>
 	
+<<<<<<< HEAD
+	<script async defer src="https://maps.googleapis.com/maps/api/js?&libraries=places&key=AIzaSyBNIVLiXyDmzGXGkgtNs_ukwQo_CarSksg&callback=init" onerror="googleError()"></script>
+=======
 	<script async defer src="https://maps.googleapis.com/maps/api/js?&libraries=places&callback=init" onerror="googleError()"></script>
+>>>>>>> 18ba52cfa2a1bc23733c4256d7597b7f59c2c5c8
 </body>
 </html>
